@@ -14,15 +14,12 @@ COL = None
 
 def update_ease_factors():
     for option_group in COL.decks.all_config():
-        print(option_group['id'], option_group['name'])
         update_ease_factor(option_group)
 
 
 # Average mature card ease factor in settings group
 def update_ease_factor(option_group):
-    avg_ease, cur_ease = mature_ease_in_settings_group(option_group)
-    # print(f'{option_group["name"]}: {avg_ease} {cur_ease}')
-
+    avg_ease, _ = mature_ease_in_settings_group(option_group)
     option_group['new']['initialFactor'] = int(avg_ease)
     COL.decks.update_config(option_group)
     COL.decks.save(option_group)
