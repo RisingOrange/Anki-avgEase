@@ -6,4 +6,4 @@ Settings are calibrated each time a profile is loaded (at startup).
 See Post: [Anki's Starting Ease Factor Settings](https://eshapard.github.io/anki/ankis-initial-ease-factor-setting.html) for the rationale behind this.
 
 ## Install
-Get it from [Ankiweb]() or clone this repository to your addons directory.
+Get it from [Ankiweb](https://ankiweb.net/shared/info/1129477042) or clone this repository to your addons directory.
