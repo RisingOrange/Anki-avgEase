@@ -11,6 +11,8 @@ from anki.hooks import addHook
 
 COL = None
 
+# the initial ease factor of option groups with less than that many cards will not be modified
+MIN_AMOUNT_MATURE_CARDS = 50
 
 def update_ease_factors():
     for option_group in COL.decks.all_config():
@@ -36,7 +38,8 @@ def mature_ease_in_settings_group(option_group):
         mature_cards, mature_ease = average_ease_in_deck(deck)
         tot_mature_cards += mature_cards
         weighted_ease += mature_cards * mature_ease
-    if tot_mature_cards > 0 and weighted_ease:
+
+    if tot_mature_cards >= MIN_AMOUNT_MATURE_CARDS:
         avg_mature_ease = int(weighted_ease / tot_mature_cards)
     else:
         # not enough data; don't change the init ease factor
