@@ -14,6 +14,7 @@ COL = None
 # the initial ease factor of option groups with less than that many cards will not be modified
 MIN_AMOUNT_MATURE_CARDS = 50
 
+
 def update_ease_factors():
     for option_group in COL.decks.all_config():
         update_ease_factor(option_group)
@@ -33,9 +34,10 @@ def mature_ease_in_settings_group(option_group):
     weighted_ease = 0
     avg_mature_ease = 0
 
-    decks = COL.decks.didsForConf(option_group)
-    for deck in decks:
-        mature_cards, mature_ease = average_ease_in_deck(deck)
+    dids = COL.decks.didsForConf(option_group)
+    for did in dids:
+        mature_cards = amount_mature_cards_in_deck(did)
+        mature_ease = average_ease_of_mature_cards_in_deck(did)
         tot_mature_cards += mature_cards
         weighted_ease += mature_cards * mature_ease
 
@@ -49,26 +51,28 @@ def mature_ease_in_settings_group(option_group):
     return avg_mature_ease, cur_ease
 
 
-# Find average ease and number of mature cards in deck
-#   mature defined as having an interval > 90 day
-def average_ease_in_deck(deck_id):
-    mature_cards = COL.db.scalar("""select
+def amount_mature_cards_in_deck(deck_id):
+    result = COL.db.scalar("""select
         count()
         from cards where
         type = 2 and
         ivl > 90 and
         did = ?""", deck_id)
-    if not mature_cards:
-        mature_cards = 0
-    mature_ease = COL.db.scalar("""select
+    if not result:
+        result = 0
+    return result
+
+
+def average_ease_of_mature_cards_in_deck(deck_id):
+    result = COL.db.scalar("""select
         avg(factor)
         from cards where
         type = 2 and
         ivl > 90 and
         did = ?""", deck_id)
-    if not mature_ease:
-        mature_ease = 0
-    return mature_cards, mature_ease
+    if not result:
+        result = 0
+    return result
 
 
 def main():
