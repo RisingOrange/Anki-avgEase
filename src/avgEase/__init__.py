@@ -9,10 +9,9 @@ import argparse
 
 from anki.hooks import addHook
 
-COL = None
+from . import config as cfg
 
-# the initial ease factor of option groups with less than that many cards will not be modified
-MIN_AMOUNT_MATURE_CARDS = 50
+COL = None
 
 
 def update_ease_factors():
@@ -41,7 +40,7 @@ def mature_ease_in_settings_group(option_group):
         tot_mature_cards += mature_cards
         weighted_ease += mature_cards * mature_ease
 
-    if tot_mature_cards >= MIN_AMOUNT_MATURE_CARDS:
+    if tot_mature_cards >= cfg.get("option_group_min_mature_card_amount"):
         avg_mature_ease = int(weighted_ease / tot_mature_cards)
     else:
         # not enough data; don't change the init ease factor
@@ -52,11 +51,11 @@ def mature_ease_in_settings_group(option_group):
 
 
 def amount_mature_cards_in_deck(deck_id):
-    result = COL.db.scalar("""select
+    result = COL.db.scalar(f"""select
         count()
         from cards where
         type = 2 and
-        ivl > 90 and
+        ivl > {cfg.get("mature_card_min_interval")} and
         did = ?""", deck_id)
     if not result:
         result = 0
@@ -64,11 +63,11 @@ def amount_mature_cards_in_deck(deck_id):
 
 
 def average_ease_of_mature_cards_in_deck(deck_id):
-    result = COL.db.scalar("""select
+    result = COL.db.scalar(f"""select
         avg(factor)
         from cards where
         type = 2 and
-        ivl > 90 and
+        ivl > {cfg.get("mature_card_min_interval")} and
         did = ?""", deck_id)
     if not result:
         result = 0
